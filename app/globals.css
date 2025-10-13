@@ -1,26 +1,574 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Reduced glow intensity for more subtle effects */
+  --background: oklch(0.08 0.01 240);
+  --foreground: oklch(0.95 0.01 240);
+  --card: oklch(0.12 0.02 240 / 0.5);
+  --card-foreground: oklch(0.95 0.01 240);
+  --popover: oklch(0.12 0.02 240 / 0.8);
+  --popover-foreground: oklch(0.95 0.01 240);
+  --primary: oklch(0.65 0.15 200);
+  --primary-foreground: oklch(0.95 0.01 240);
+  --secondary: oklch(0.18 0.02 240 / 0.5);
+  --secondary-foreground: oklch(0.95 0.01 240);
+  --muted: oklch(0.2 0.01 240 / 0.4);
+  --muted-foreground: oklch(0.65 0.01 240);
+  --accent: oklch(0.7 0.18 180);
+  --accent-foreground: oklch(0.95 0.01 240);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.95 0.01 240);
+  --border: oklch(0.3 0.02 240 / 0.3);
+  --input: oklch(0.2 0.02 240 / 0.5);
+  --ring: oklch(0.65 0.15 200 / 0.5);
+  --glow: oklch(0.65 0.15 200);
+  --radius: 1rem;
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+:root.red-theme {
+  --primary: oklch(0.65 0.25 25);
+  --accent: oklch(0.7 0.22 30);
+  --glow: oklch(0.65 0.25 25);
+  --ring: oklch(0.65 0.25 25 / 0.5);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.145 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.269 0 0);
+  --input: oklch(0.269 0 0);
+  --ring: oklch(0.439 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.269 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-glow: var(--glow);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    transition: background-color 0.8s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+      color 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  body {
+    @apply bg-background text-foreground;
+    /* Restored default cursor */
+    cursor: default;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Added custom minimal scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: oklch(0.08 0.01 240);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: oklch(0.2 0.01 240);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.3 0.01 240);
+  }
+
+  /* Firefox scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: oklch(0.2 0.01 240) oklch(0.08 0.01 240);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  /* Updated text glow to use CSS variable for theme support */
+  .text-glow-subtle {
+    text-shadow: 0 0 8px var(--glow) / 0.25, 0 0 16px var(--glow) / 0.12;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 12px var(--glow) / 0.35, 0 0 24px var(--glow) / 0.18;
+  }
+
+  /* Updated border glow to use CSS variable for theme support */
+  .border-glow-subtle {
+    box-shadow: 0 0 8px var(--glow) / 0.15, 0 0 16px var(--glow) / 0.08;
+  }
+
+  .border-glow-subtle:hover {
+    box-shadow: 0 0 12px var(--glow) / 0.25, 0 0 24px var(--glow) / 0.15;
+  }
+
+  .glass {
+    background: oklch(0.12 0.02 240 / 0.3);
+    backdrop-filter: blur(16px);
+    border: 1px solid oklch(0.3 0.02 240 / 0.3);
+  }
+
+  .glass-card {
+    background: linear-gradient(135deg, oklch(0.15 0.02 240 / 0.4), oklch(0.12 0.02 240 / 0.2));
+    backdrop-filter: blur(20px);
+    border: 1px solid oklch(0.3 0.02 240 / 0.4);
+    box-shadow: 0 8px 32px oklch(0 0 0 / 0.4), inset 0 1px 0 oklch(1 0 0 / 0.08);
+  }
+
+  .bg-gradient-radial {
+    background: radial-gradient(circle at center, var(--tw-gradient-stops));
+  }
+
+  /* Smoother animation keyframes with better easing */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-20px) rotate(1deg);
+    }
+  }
+
+  @keyframes bounceSlow {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes drawLine {
+    from {
+      height: 0;
+      opacity: 0;
+    }
+    to {
+      height: 100%;
+      opacity: 1;
+    }
+  }
+
+  @keyframes pulseDot {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 oklch(0.65 0.15 200 / 0.6);
+    }
+    50% {
+      box-shadow: 0 0 0 10px oklch(0.65 0.15 200 / 0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      transform: scale(0);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Added gradient flow animation for name */
+  @keyframes gradientFlow {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  /* Added custom cursor pulse animation that contracts then expands */
+  @keyframes cursorPulse {
+    0%,
+    100% {
+      transform: scaleX(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scaleX(0.3);
+      opacity: 0.7;
+    }
+  }
+
+  /* Added pulsing glow animation for name */
+  @keyframes nameGlow {
+    0%,
+    100% {
+      filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.3)) drop-shadow(0 0 16px rgba(59, 130, 246, 0.2));
+    }
+    50% {
+      filter: drop-shadow(0 0 12px rgba(34, 211, 238, 0.5)) drop-shadow(0 0 24px rgba(59, 130, 246, 0.3));
+    }
+  }
+
+  /* Fixed cursor animation to expand vertically (height) not horizontally */
+  @keyframes cursorExpand {
+    0%,
+    100% {
+      transform: scaleY(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scaleY(0.3);
+      opacity: 0.6;
+    }
+  }
+
+  /* Added diagonal sliding animations for geometric shapes */
+  @keyframes slideDiagonal1 {
+    0% {
+      transform: translateX(-100%) translateY(-100%) rotate(25deg);
+      opacity: 0;
+    }
+    15% {
+      opacity: 0.6;
+    }
+    85% {
+      opacity: 0.6;
+    }
+    100% {
+      transform: translateX(100%) translateY(100%) rotate(25deg);
+      opacity: 0;
+    }
+  }
+
+  @keyframes slideDiagonal2 {
+    0% {
+      transform: translateX(100%) translateY(100%) rotate(-25deg);
+      opacity: 0;
+    }
+    15% {
+      opacity: 0.6;
+    }
+    85% {
+      opacity: 0.6;
+    }
+    100% {
+      transform: translateX(-100%) translateY(-100%) rotate(-25deg);
+      opacity: 0;
+    }
+  }
+
+  @keyframes slideDiagonal3 {
+    0% {
+      transform: translateX(100%) translateY(-50%) rotate(35deg);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(-100%) translateY(50%) rotate(35deg);
+      opacity: 0;
+    }
+  }
+
+  @keyframes slideDiagonal4 {
+    0% {
+      transform: translateX(-100%) translateY(100%) rotate(-35deg);
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(100%) translateY(-100%) rotate(-35deg);
+      opacity: 0;
+    }
+  }
+
+  /* Added pulsing ring animation for profile photo */
+  @keyframes pulseRing {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.3;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 0.5;
+    }
+  }
+
+  .animate-slide-diagonal-1 {
+    animation: slideDiagonal1 22s ease-in-out infinite;
+  }
+
+  .animate-slide-diagonal-2 {
+    animation: slideDiagonal2 28s ease-in-out infinite;
+    animation-delay: 5s;
+  }
+
+  .animate-slide-diagonal-3 {
+    animation: slideDiagonal3 30s ease-in-out infinite;
+    animation-delay: 10s;
+  }
+
+  .animate-slide-diagonal-4 {
+    animation: slideDiagonal4 26s ease-in-out infinite;
+    animation-delay: 8s;
+  }
+
+  .animate-pulse-ring {
+    animation: pulseRing 3s ease-in-out infinite;
+  }
+
+  /* Animation classes */
+  .animate-fade-in-up {
+    animation: fadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animate-float {
+    animation: float 10s ease-in-out infinite;
+  }
+
+  .animate-bounce-slow {
+    animation: bounceSlow 3s ease-in-out infinite;
+  }
+
+  .animate-draw-line {
+    animation: drawLine 3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animate-pulse-dot {
+    animation: pulseDot 3s ease-in-out infinite;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+  }
+
+  .animate-gradient-flow {
+    animation: gradientFlow 6s ease-in-out infinite;
+  }
+
+  .animate-cursor-pulse {
+    animation: cursorPulse 1.5s ease-in-out infinite;
+  }
+
+  .animate-name-glow {
+    animation: nameGlow 3s ease-in-out infinite;
+  }
+
+  .animate-cursor-expand {
+    animation: cursorExpand 1.5s ease-in-out infinite;
+  }
+
+  /* Improved scroll-triggered animations with smoother transitions */
+  .animate-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .animate-on-scroll.in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Animation delays */
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+
+  /* Fixed cursor animation to fully vanish (opacity 0) and expand vertically */
+  @keyframes cursorExpandVanish {
+    0%,
+    100% {
+      transform: scaleY(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scaleY(0);
+      opacity: 0;
+    }
+  }
+
+  /* Added 3D floating animation for interactive element */
+  @keyframes float3d {
+    0%,
+    100% {
+      transform: translateY(0px) translateZ(0px) rotateY(0deg);
+    }
+    50% {
+      transform: translateY(-30px) translateZ(20px) rotateY(10deg);
+    }
+  }
+
+  /* Slowed down gradient animation by 5x (from 6s to 30s) */
+  @keyframes nameGlowSubtle {
+    0%,
+    100% {
+      filter: drop-shadow(0 0 4px rgba(34, 211, 238, 0.2)) drop-shadow(0 0 8px rgba(59, 130, 246, 0.15));
+    }
+    50% {
+      filter: drop-shadow(0 0 6px rgba(34, 211, 238, 0.3)) drop-shadow(0 0 12px rgba(59, 130, 246, 0.2));
+    }
+  }
+
+  .animate-cursor-expand-vanish {
+    animation: cursorExpandVanish 1.5s ease-in-out infinite;
+  }
+
+  .animate-float-3d {
+    animation: float3d 8s ease-in-out infinite;
+  }
+
+  .animate-name-glow-subtle {
+    animation: nameGlowSubtle 30s ease-in-out infinite;
+  }
+
+  /* Changed cursor to simple slow blink */
+  @keyframes cursorBlink {
+    0%,
+    49% {
+      opacity: 1;
+    }
+    50%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* Added ripple expand animation */
+  @keyframes rippleExpand {
+    0% {
+      transform: scale(0);
+      opacity: 0.8;
+    }
+    100% {
+      transform: scale(4);
+      opacity: 0;
+    }
+  }
+
+  /* Added slow cursor blink animation */
+  .animate-cursor-blink {
+    animation: cursorBlink 1.2s ease-in-out infinite;
+  }
 }
