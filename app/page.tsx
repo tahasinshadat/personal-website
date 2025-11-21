@@ -12,6 +12,7 @@ import { Canvas, useThree } from "@react-three/fiber"
 import { OrbitControls, Sphere } from "@react-three/drei"
 import { useFrame } from "@react-three/fiber"
 import * as THREE from "three"
+import { SplineScene } from "@/components/ui/splite"
 
 function MeshGlobe() {
   const { size } = useThree()
@@ -85,58 +86,88 @@ const projects: Project[] = [
   {
     title: "T.R.A.C.E.R",
     description:
-      "Autonomous tunnel response robot powered by three specialized AI models to identify emergencies and route two-way communication between civilians and authorities.",
-    tags: ["Python", "TensorFlow", "Flask", "Raspberry Pi", "Robotics"],
+      "Autonomous tunnel-response robot powered by multi-model AI vision and sensor fusion to detect emergencies and route two-way communication between civilians and authorities.",
+    tags: ["Python", "OpenCV", "Flask", "Raspberry Pi", "Robotics", "Computer Vision"],
     github: "https://github.com/tahasinshadat/PROJECT-TRACER",
+  },
+  {
+    title: "EdgePilot",
+    description:
+      "On-premises AI copilot combining a FastAPI backend and an Electron UI with full MCP integration. Provides system monitoring, application launching, process management, a task scheduler, usage alerts, and a full local REST API powered by Gemini function-calling.",
+    tags: [
+      "Python", "FastAPI", "Electron", "Node.js", "TypeScript", "MCP", "Gemini", "System Monitoring", "Process Automation"],
+    github: "https://github.com/tahasinshadat/EdgePilot",
+  },
+  {
+    title: "JARVIS – Agentic Desktop Copilot",
+    description:
+      "Voice-activated agentic desktop assistant using Gemini, ElevenLabs, and PyAutoGUI to see the screen, perform UI actions, automate workflows, and control the computer autonomously.",
+    tags: ["Python", "Gemini API", "ElevenLabs", "PyAutoGUI", "Agentic AI", "Automation"],
+    github: "https://github.com/tahasinshadat/agentic-pilot",
   },
   {
     title: "Investing Analysis ML Platform",
     description:
-      "Machine learning toolkit that tracks sentiment, macro indicators, and Q10 metrics to support Brookfield analysts with investment recommendations.",
-    tags: ["Python", "Pandas", "scikit-learn", "NLP"],
+      "Investment research toolkit built for Brookfield, combining sentiment analysis, macro indicators, analyst ratings, Q10 parsing, and ML-driven valuation recommendations.",
+    tags: ["Python", "Pandas", "NumPy", "scikit-learn", "NLP", "Finance"],
     github: "https://github.com/tahasinshadat/Investing-Analysis-Machine-Learning-Project",
+  },
+  {
+    title: "Algorithm Visualizer (C++)",
+    description:
+      "Interactive visualizer for data structures and algorithms with a lightweight graphics engine. Built to explore quant-relevant structures like segment trees, graphs, and balanced trees.",
+    tags: ["C++", "Algorithms", "Data Structures", "Graphics"],
+    github: "https://github.com/tahasinshadat/Algorithm-Visualizer",
+  },
+  {
+    title: "Chess++",
+    description:
+      "C++ multiplayer chess platform with clean board representation, move validation, piece hierarchies, and networking for live online play.",
+    tags: ["C++", "Networking", "Game Engine", "OOP"],
+    github: "https://github.com/tahasinshadat/multiplayer-chess",
   },
   {
     title: "Fitness101",
     description:
-      "Social fitness platform delivering personalized workout plans, recipes, and health guidance backed by real-time database updates and third-party APIs.",
-    tags: ["JavaScript", "Firebase", "Bootstrap", "Materialize"],
+      "Social fitness web app with personalized workout plans, recipe generation, and real-time data updates using external APIs.",
+    tags: ["JavaScript", "HTML", "CSS", "Python", "Web APIs"],
     github: "https://github.com/tahasinshadat/Fitness101",
   },
   {
     title: "AI Mario Kart Racer",
     description:
-      "Reinforcement learning experiment that trains a deep neural network to autonomously race in Mario Kart, built in collaboration with Google mentors.",
+      "Deep reinforcement learning experiment that trains a neural network to autonomously race in Mario Kart, built in collaboration with Google mentors.",
     tags: ["Python", "TensorFlow", "PyTorch", "Reinforcement Learning"],
   },
   {
     title: "Instagram Clone",
     description:
-      "Full-stack recreation of Instagram for web and mobile with rich media sharing, messaging, and authentication workflows.",
-    tags: ["Python", "Flask", "MongoDB", "PostgreSQL", "React Native"],
+      "Full-stack Instagram remake with media sharing, DMs, authentication, and feed generation for both web and mobile.",
+    tags: ["Python", "Flask", "MongoDB", "React Native", "PostgreSQL"],
   },
   {
     title: "Retro-GameSite",
     description:
-      "Collection of eight HTML5 retro games presented during Google's 2023 Showcase, emphasizing modular architecture and canvas-based gameplay.",
+      "Collection of eight modular HTML5 retro games built for Google's 2023 Showcase, designed with canvas rendering and clean architecture.",
     tags: ["JavaScript", "HTML5 Canvas", "CSS"],
     github: "https://github.com/tahasinshadat/Retro-GameSite",
   },
   {
     title: "Sudoku Solver",
     description:
-      "Desktop Sudoku assistant that applies a backtracking algorithm and interactive GUI to solve puzzles in real time.",
+      "Interactive desktop Sudoku solver using a backtracking algorithm and Tkinter GUI.",
     tags: ["Python", "Tkinter", "Algorithms"],
     github: "https://github.com/tahasinshadat/Sudoku-Solver",
   },
   {
     title: "Realm-Raiders",
     description:
-      "2D roguelike inspired by Soul Knight featuring procedural dungeons, weapon classes, and A* pathfinding for enemy AI.",
-    tags: ["C#", "Unity", "Game Dev"],
+      "2D roguelike inspired by Soul Knight with procedural generation, weapon classes, and A*-driven enemy AI.",
+    tags: ["Java", "OOP", "Game Dev"],
     github: "https://github.com/tahasinshadat/Realm-Raiders",
-  },
-]
+  }
+];
+
 
 const experiences = [
   {
@@ -347,7 +378,7 @@ export default function Home() {
         </div>
       </article>
 
-      <article id="projects" className="min-h-screen pt-20 sm:pt-32 pb-28 sm:pb-36 px-0">
+      <article id="projects" className="min-h-screen pt-20 sm:pt-32 pb-28 sm:pb-36 px-0 overflow-x-hidden">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-0">
           <header className="space-y-4 mb-12 sm:mb-16 animate-on-scroll">
             <p className="text-primary font-mono text-glow-subtle text-sm sm:text-base">Projects</p>
@@ -356,62 +387,87 @@ export default function Home() {
               A collection of projects showcasing my work in AI, robotics, and full-stack development.
             </p>
           </header>
-          <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
-            {projects.map((project, index) => (
-              <Card
-                key={index}
-                className="group bg-card/90 backdrop-blur-md border-border/80 hover:border-primary/60 transition-all duration-700 hover:shadow-2xl hover:shadow-primary/10 hover:scale-[1.02] animate-on-scroll cursor-pointer relative overflow-hidden"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/3 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                <CardHeader className="relative z-10">
-                  <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="text-lg sm:text-xl md:text-2xl group-hover:text-primary transition-all duration-500">
-                      {project.title}
-                    </CardTitle>
-                    <div className="flex gap-2 sm:gap-3 flex-shrink-0">
-                      {project.github && (
-                        <Link
-                          href={project.github}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-muted-foreground hover:text-primary transition-all duration-500 hover:scale-110"
-                          aria-label={`View ${project.title} on GitHub`}
-                        >
-                          <Github className="w-4 h-4 sm:w-5 sm:h-5" />
-                        </Link>
-                      )}
-                      {project.demo && (
-                        <Link
-                          href={project.demo}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-muted-foreground hover:text-primary transition-all duration-500 hover:scale-110"
-                          aria-label={`View ${project.title} demo`}
-                        >
-                          <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
-                        </Link>
-                      )}
+          <div className="relative">
+            <div className="hidden lg:block absolute inset-y-0 right-[-70%] w-[130%] z-0">
+              <div className="relative h-full">
+                <div
+                  className="w-full h-full"
+                  style={{
+                    WebkitMaskImage: 'linear-gradient(to top, transparent 0%, rgba(0,0,0,0.3) 8%, rgba(0,0,0,0.6) 15%, black 22%)',
+                    maskImage: 'linear-gradient(to top, transparent 0%, rgba(0,0,0,0.3) 8%, rgba(0,0,0,0.6) 15%, black 22%)'
+                  }}
+                >
+                  <SplineScene
+                    scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+                    className="w-full h-full scale-[1.08] translate-x-2"
+                  />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-l from-background/5 via-background/25 to-transparent pointer-events-none" />
+              </div>
+            </div>
+            <div className="lg:hidden relative mb-8 rounded-2xl overflow-hidden border border-border/60 bg-black h-[360px] sm:h-[420px]">
+              <SplineScene
+                scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+                className="w-full h-full scale-[1.2]"
+              />
+            </div>
+            <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 relative z-20 w-full lg:pr-12 xl:pr-16 pointer-events-none">
+              {projects.map((project, index) => (
+                <Card
+                  key={index}
+                  className="group bg-card/90 backdrop-blur-md border-border/80 hover:border-primary/60 transition-all duration-700 hover:shadow-2xl hover:shadow-primary/10 hover:scale-[1.02] animate-on-scroll cursor-pointer relative overflow-hidden pointer-events-auto"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/3 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                  <CardHeader className="relative z-10">
+                    <div className="flex items-start justify-between gap-2">
+                      <CardTitle className="text-lg sm:text-xl md:text-2xl group-hover:text-primary transition-all duration-500">
+                        {project.title}
+                      </CardTitle>
+                      <div className="flex gap-2 sm:gap-3 flex-shrink-0">
+                        {project.github && (
+                          <Link
+                            href={project.github}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-muted-foreground hover:text-primary transition-all duration-500 hover:scale-110"
+                            aria-label={`View ${project.title} on GitHub`}
+                          >
+                            <Github className="w-4 h-4 sm:w-5 sm:h-5" />
+                          </Link>
+                        )}
+                        {project.demo && (
+                          <Link
+                            href={project.demo}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-muted-foreground hover:text-primary transition-all duration-500 hover:scale-110"
+                            aria-label={`View ${project.title} demo`}
+                          >
+                            <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
+                          </Link>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  <CardDescription className="text-xs sm:text-sm md:text-base leading-relaxed text-muted-foreground/85">
-                    {project.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="relative z-10">
-                  <div className="flex flex-wrap gap-2">
-                    {project.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2 sm:px-3 py-0.5 sm:py-1 bg-secondary/70 backdrop-blur-sm text-secondary-foreground rounded text-xs font-mono group-hover:bg-primary/20 transition-all duration-500"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    <CardDescription className="text-xs sm:text-sm md:text-base leading-relaxed text-muted-foreground/85">
+                      {project.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="relative z-10">
+                    <div className="flex flex-wrap gap-2">
+                      {project.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="px-2 sm:px-3 py-0.5 sm:py-1 bg-secondary/70 backdrop-blur-sm text-secondary-foreground rounded text-xs font-mono group-hover:bg-primary/20 transition-all duration-500"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
         </div>
       </article>
