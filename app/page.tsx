@@ -241,7 +241,10 @@ export default function Home() {
   const email = "tahasinshadat@gmail.com"
   const [scrollY, setScrollY] = useState(0)
   const [showBackToTop, setShowBackToTop] = useState(false)
+  const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null)
+  const [visibleCardIndices, setVisibleCardIndices] = useState<Set<number>>(new Set())
   const observerRef = useRef<IntersectionObserver | null>(null)
+  const projectsGridRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -253,11 +256,51 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!projectsGridRef.current) return
+
+      const cards = projectsGridRef.current.querySelectorAll('[data-project-card]')
+      let foundHover = false
+
+      cards.forEach((card, index) => {
+        const rect = card.getBoundingClientRect()
+        const isInside =
+          e.clientX >= rect.left &&
+          e.clientX <= rect.right &&
+          e.clientY >= rect.top &&
+          e.clientY <= rect.bottom
+
+        if (isInside) {
+          setHoveredCardIndex(index)
+          foundHover = true
+        }
+      })
+
+      if (!foundHover) {
+        setHoveredCardIndex(null)
+      }
+    }
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true })
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+    }
+  }, [])
+
+  useEffect(() => {
     observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add("in-view")
+            const element = entry.target
+            const cardIndex = element.getAttribute('data-card-index')
+
+            if (cardIndex !== null) {
+              setVisibleCardIndices(prev => new Set(prev).add(Number(cardIndex)))
+            } else {
+              entry.target.classList.add("in-view")
+            }
           }
         })
       },
@@ -411,17 +454,29 @@ export default function Home() {
                 className="w-full h-full scale-[1.2]"
               />
             </div>
-            <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 relative z-20 w-full lg:pr-12 xl:pr-16 pointer-events-none">
+            <div ref={projectsGridRef} className="grid sm:grid-cols-2 gap-4 sm:gap-6 relative z-20 w-full lg:pr-12 xl:pr-16 pointer-events-none">
               {projects.map((project, index) => (
                 <Card
                   key={index}
-                  className="group bg-card/90 backdrop-blur-md border-border/80 hover:border-primary/60 transition-all duration-700 hover:shadow-2xl hover:shadow-primary/10 hover:scale-[1.02] animate-on-scroll cursor-pointer relative overflow-hidden pointer-events-auto"
+                  data-project-card
+                  data-card-index={index}
+                  className={`group bg-card/90 backdrop-blur-md border-border/80 transition-all duration-700 animate-on-scroll relative overflow-hidden pointer-events-none ${
+                    visibleCardIndices.has(index) ? 'in-view' : ''
+                  } ${
+                    hoveredCardIndex === index
+                      ? 'border-primary/60 shadow-2xl shadow-primary/10'
+                      : ''
+                  }`}
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/3 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                  <div className={`absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/3 transition-opacity duration-700 ${
+                    hoveredCardIndex === index ? 'opacity-100' : 'opacity-0'
+                  }`} />
                   <CardHeader className="relative z-10">
                     <div className="flex items-start justify-between gap-2">
-                      <CardTitle className="text-lg sm:text-xl md:text-2xl group-hover:text-primary transition-all duration-500">
+                      <CardTitle className={`text-lg sm:text-xl md:text-2xl transition-all duration-500 ${
+                        hoveredCardIndex === index ? 'text-primary' : ''
+                      }`}>
                         {project.title}
                       </CardTitle>
                       <div className="flex gap-2 sm:gap-3 flex-shrink-0">
@@ -430,7 +485,7 @@ export default function Home() {
                             href={project.github}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-muted-foreground hover:text-primary transition-all duration-500 hover:scale-110"
+                            className="text-muted-foreground hover:text-primary transition-all duration-500 hover:scale-110 pointer-events-auto"
                             aria-label={`View ${project.title} on GitHub`}
                           >
                             <Github className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -441,7 +496,7 @@ export default function Home() {
                             href={project.demo}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-muted-foreground hover:text-primary transition-all duration-500 hover:scale-110"
+                            className="text-muted-foreground hover:text-primary transition-all duration-500 hover:scale-110 pointer-events-auto"
                             aria-label={`View ${project.title} demo`}
                           >
                             <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -458,7 +513,9 @@ export default function Home() {
                       {project.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="px-2 sm:px-3 py-0.5 sm:py-1 bg-secondary/70 backdrop-blur-sm text-secondary-foreground rounded text-xs font-mono group-hover:bg-primary/20 transition-all duration-500"
+                          className={`px-2 sm:px-3 py-0.5 sm:py-1 backdrop-blur-sm text-secondary-foreground rounded text-xs font-mono transition-all duration-500 ${
+                            hoveredCardIndex === index ? 'bg-primary/20' : 'bg-secondary/70'
+                          }`}
                         >
                           {tag}
                         </span>
