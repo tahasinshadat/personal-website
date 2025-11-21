@@ -30,7 +30,7 @@ export default function Navigation() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
         <div className="flex items-center justify-between h-16">
           <Link
             href="/"
@@ -43,19 +43,19 @@ export default function Navigation() {
             TS
           </Link>
 
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-3 sm:gap-4 md:gap-6 lg:gap-8">
             {navItems.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
                 onClick={(e) => scrollToSection(e, item.href)}
-                className="font-mono text-sm transition-colors hover:text-primary text-muted-foreground"
+                className="hidden md:block font-mono text-sm transition-colors hover:text-primary text-muted-foreground"
               >
                 {item.label}
               </a>
             ))}
 
-            <div className="flex items-center gap-4 ml-2">
+            <div className="hidden sm:flex items-center gap-3 md:gap-4 md:ml-2">
               <a
                 href="https://github.com/tahasinshadat"
                 target="_blank"
@@ -97,7 +97,7 @@ export default function Navigation() {
               asChild
               variant="outline"
               size="sm"
-              className="glass hover:glass-card border-primary/30 text-foreground bg-transparent rounded-md hover:bg-gradient-to-r hover:from-cyan-500/10 hover:via-blue-500/10 hover:to-purple-600/10 hover:border-primary/50 transition-all duration-500"
+              className="glass hover:glass-card border-primary/30 text-foreground bg-transparent rounded-md hover:bg-gradient-to-r hover:from-cyan-500/10 hover:via-blue-500/10 hover:to-purple-600/10 hover:border-primary/50 transition-all duration-500 text-xs sm:text-sm px-3 sm:px-4"
             >
               <a href="/Tahasin-Shadat-Resume.pdf" target="_blank" rel="noopener noreferrer">
                 Resume

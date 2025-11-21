@@ -603,7 +603,7 @@ export default function Home() {
         id="contact"
         className="min-h-screen -mt-8 sm:-mt-14 lg:-mt-20 pt-44 sm:pt-56 pb-20 sm:pb-28 px-4 sm:px-6 lg:px-8 relative overflow-visible"
       >
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20 overflow-visible">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40 sm:opacity-20 overflow-visible">
           <Canvas
             camera={{ position: [0, 0, 13], fov: 45 }}
             className="w-full h-[108vh] min-h-[620px] max-h-[1080px] translate-y-12 sm:translate-y-16 lg:translate-y-20"
