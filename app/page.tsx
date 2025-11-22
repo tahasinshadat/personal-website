@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef, useMemo } from "react"
+import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import Image from "next/image"
 import { ArrowDown, Github, Linkedin, Mail, Copy, Check, ExternalLink, ArrowUp } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -8,49 +8,22 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import Link from "next/link"
-import { Canvas, useThree } from "@react-three/fiber"
-import { OrbitControls, Sphere } from "@react-three/drei"
-import { useFrame } from "@react-three/fiber"
-import * as THREE from "three"
-import { SplineScene } from "@/components/ui/splite"
+import dynamic from "next/dynamic"
 
-function MeshGlobe() {
-  const { size } = useThree()
-  const radius = useMemo(() => {
-    if (size.width < 640) return 2.6
-    if (size.width < 1024) return 3.6
-    return 4.4
-  }, [size.width])
+const SplineScene = dynamic(() => import("@/components/ui/splite").then(mod => ({ default: mod.SplineScene })), {
+  ssr: false,
+  loading: () => <div className="w-full h-full flex items-center justify-center"><div className="loader"></div></div>
+})
 
-  return (
-    <Sphere args={[radius, 48, 48]}>
-      <meshBasicMaterial color="#22d3ee" wireframe opacity={0.65} transparent />
-    </Sphere>
-  )
-}
+const HeroIcosahedron = dynamic(() => import("@/components/three-scene").then(mod => ({ default: mod.HeroIcosahedron })), {
+  ssr: false,
+  loading: () => <div className="w-full h-full" />
+})
 
-function WireframeIcosahedron() {
-  const meshRef = useRef<THREE.Mesh>(null)
-
-  useFrame((state, delta) => {
-    if (meshRef.current) {
-      // Smooth rotation
-      meshRef.current.rotation.x += delta * 0.2
-      meshRef.current.rotation.y += delta * 0.3
-
-      // Subtle pulsing effect (scale between 0.97 and 1.03)
-      const scale = 1 + Math.sin(state.clock.elapsedTime * 0.8) * 0.03
-      meshRef.current.scale.setScalar(scale)
-    }
-  })
-
-  return (
-    <mesh ref={meshRef}>
-      <icosahedronGeometry args={[1.5, 1]} />
-      <meshBasicMaterial color="#22d3ee" wireframe opacity={0.6} transparent side={THREE.DoubleSide} />
-    </mesh>
-  )
-}
+const ContactGlobe = dynamic(() => import("@/components/three-scene").then(mod => ({ default: mod.ContactGlobe })), {
+  ssr: false,
+  loading: () => <div className="w-full h-full" />
+})
 
 const skills = [
   "Python",
@@ -243,8 +216,19 @@ export default function Home() {
   const [showBackToTop, setShowBackToTop] = useState(false)
   const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null)
   const [visibleCardIndices, setVisibleCardIndices] = useState<Set<number>>(new Set())
+  const [isMobile, setIsMobile] = useState(false)
   const observerRef = useRef<IntersectionObserver | null>(null)
   const projectsGridRef = useRef<HTMLDivElement>(null)
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024 || 'ontouchstart' in window)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -256,37 +240,59 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
+    // Skip hover tracking on mobile devices for better performance
+    if (isMobile) return
+
+    let rafId: number | null = null
+    let lastTime = 0
+    const throttleDelay = 16 // ~60fps
+
     const handleMouseMove = (e: MouseEvent) => {
-      if (!projectsGridRef.current) return
+      const currentTime = Date.now()
 
-      const cards = projectsGridRef.current.querySelectorAll('[data-project-card]')
-      let foundHover = false
+      if (currentTime - lastTime < throttleDelay) return
+      lastTime = currentTime
 
-      cards.forEach((card, index) => {
-        const rect = card.getBoundingClientRect()
-        const isInside =
-          e.clientX >= rect.left &&
-          e.clientX <= rect.right &&
-          e.clientY >= rect.top &&
-          e.clientY <= rect.bottom
+      if (rafId) return
 
-        if (isInside) {
-          setHoveredCardIndex(index)
-          foundHover = true
+      rafId = requestAnimationFrame(() => {
+        if (!projectsGridRef.current) {
+          rafId = null
+          return
         }
-      })
 
-      if (!foundHover) {
-        setHoveredCardIndex(null)
-      }
+        const cards = projectsGridRef.current.querySelectorAll('[data-project-card]')
+        let foundHover = false
+
+        cards.forEach((card, index) => {
+          const rect = card.getBoundingClientRect()
+          const isInside =
+            e.clientX >= rect.left &&
+            e.clientX <= rect.right &&
+            e.clientY >= rect.top &&
+            e.clientY <= rect.bottom
+
+          if (isInside) {
+            setHoveredCardIndex(index)
+            foundHover = true
+          }
+        })
+
+        if (!foundHover) {
+          setHoveredCardIndex(null)
+        }
+
+        rafId = null
+      })
     }
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true })
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
+      if (rafId) cancelAnimationFrame(rafId)
     }
-  }, [])
+  }, [isMobile])
 
   useEffect(() => {
     observerRef.current = new IntersectionObserver(
@@ -313,15 +319,18 @@ export default function Home() {
     return () => observerRef.current?.disconnect()
   }, [])
 
-  const copyEmail = () => {
+  const copyEmail = useCallback(() => {
     navigator.clipboard.writeText(email)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
-  }
+  }, [email])
 
-  const scrollToTop = () => {
+  const scrollToTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: "smooth" })
-  }
+  }, [])
+
+  // Memoize projects to prevent re-renders
+  const memoizedProjects = useMemo(() => projects, [])
 
   return (
     <div className="w-full">
@@ -334,10 +343,7 @@ export default function Home() {
           <div className="absolute bottom-0 right-1/4 w-[900px] h-[4px] bg-gradient-to-r from-transparent via-blue-500/60 to-transparent rotate-[-25deg] origin-right animate-slide-diagonal-2" />
         </div>
         <div className="absolute right-4 sm:right-8 lg:right-16 -bottom-24 sm:-bottom-28 md:-bottom-32 w-56 h-56 sm:w-72 sm:h-72 md:w-80 md:h-80 opacity-60 pointer-events-none">
-          <Canvas camera={{ position: [0, 0, 4], fov: 50 }}>
-            <ambientLight intensity={0.3} />
-            <WireframeIcosahedron />
-          </Canvas>
+          <HeroIcosahedron />
         </div>
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl animate-float" />
         <div
@@ -431,23 +437,25 @@ export default function Home() {
             </p>
           </header>
           <div className="relative">
-            <div className="hidden lg:block absolute inset-y-0 right-[-70%] w-[130%] z-0">
-              <div className="relative h-full">
-                <div
-                  className="w-full h-full"
-                  style={{
-                    WebkitMaskImage: 'linear-gradient(to top, transparent 0%, rgba(0,0,0,0.3) 8%, rgba(0,0,0,0.6) 15%, black 22%)',
-                    maskImage: 'linear-gradient(to top, transparent 0%, rgba(0,0,0,0.3) 8%, rgba(0,0,0,0.6) 15%, black 22%)'
-                  }}
-                >
-                  <SplineScene
-                    scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-                    className="w-full h-full scale-[1.08] translate-x-2"
-                  />
+            {!isMobile && (
+              <div className="hidden lg:block absolute inset-y-0 right-[-70%] w-[130%] z-0">
+                <div className="relative h-full">
+                  <div
+                    className="w-full h-full"
+                    style={{
+                      WebkitMaskImage: 'linear-gradient(to top, transparent 0%, rgba(0,0,0,0.3) 8%, rgba(0,0,0,0.6) 15%, black 22%)',
+                      maskImage: 'linear-gradient(to top, transparent 0%, rgba(0,0,0,0.3) 8%, rgba(0,0,0,0.6) 15%, black 22%)'
+                    }}
+                  >
+                    <SplineScene
+                      scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+                      className="w-full h-full scale-[1.08] translate-x-2"
+                    />
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-l from-background/5 via-background/25 to-transparent pointer-events-none" />
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-l from-background/5 via-background/25 to-transparent pointer-events-none" />
               </div>
-            </div>
+            )}
             <div className="lg:hidden relative mb-8 rounded-2xl overflow-hidden border border-border/60 bg-black h-[360px] sm:h-[420px]">
               <SplineScene
                 scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
@@ -455,7 +463,7 @@ export default function Home() {
               />
             </div>
             <div ref={projectsGridRef} className="grid sm:grid-cols-2 gap-4 sm:gap-6 relative z-20 w-full lg:pr-12 xl:pr-16 pointer-events-none">
-              {projects.map((project, index) => (
+              {memoizedProjects.map((project, index) => (
                 <Card
                   key={index}
                   data-project-card
@@ -604,14 +612,7 @@ export default function Home() {
         className="min-h-screen -mt-8 sm:-mt-14 lg:-mt-20 pt-44 sm:pt-56 pb-20 sm:pb-28 px-4 sm:px-6 lg:px-8 relative overflow-visible"
       >
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40 sm:opacity-20 overflow-visible">
-          <Canvas
-            camera={{ position: [0, 0, 13], fov: 45 }}
-            className="w-full h-[108vh] min-h-[620px] max-h-[1080px] translate-y-12 sm:translate-y-16 lg:translate-y-20"
-          >
-            <ambientLight intensity={0.75} />
-            <MeshGlobe />
-            <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={0.5} />
-          </Canvas>
+          <ContactGlobe />
         </div>
         <div className="max-w-3xl mx-auto relative z-10">
           <header className="space-y-4 mb-12 sm:mb-16 text-center animate-on-scroll">
