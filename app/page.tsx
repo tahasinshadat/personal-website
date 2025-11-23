@@ -217,8 +217,12 @@ export default function Home() {
   const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null)
   const [visibleCardIndices, setVisibleCardIndices] = useState<Set<number>>(new Set())
   const [isMobile, setIsMobile] = useState(false)
+  const [shouldRenderProjectsRobot, setShouldRenderProjectsRobot] = useState(false)
+  const [shouldRenderContactGlobe, setShouldRenderContactGlobe] = useState(false)
   const observerRef = useRef<IntersectionObserver | null>(null)
   const projectsGridRef = useRef<HTMLDivElement>(null)
+  const projectsSectionRef = useRef<HTMLElement>(null)
+  const contactSectionRef = useRef<HTMLElement>(null)
 
   // Detect mobile device
   useEffect(() => {
@@ -228,6 +232,36 @@ export default function Home() {
     checkMobile()
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  // Lazy load 3D components when sections come into view
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            if (entry.target === projectsSectionRef.current) {
+              setShouldRenderProjectsRobot(true)
+            } else if (entry.target === contactSectionRef.current) {
+              setShouldRenderContactGlobe(true)
+            }
+          }
+        })
+      },
+      {
+        rootMargin: '150px', // Start loading 200px before section is visible
+        threshold: 0.01
+      }
+    )
+
+    if (projectsSectionRef.current) {
+      observer.observe(projectsSectionRef.current)
+    }
+    if (contactSectionRef.current) {
+      observer.observe(contactSectionRef.current)
+    }
+
+    return () => observer.disconnect()
   }, [])
 
   useEffect(() => {
@@ -334,8 +368,6 @@ export default function Home() {
 
   return (
     <div className="w-full">
-      <div className="cursor-trail" />
-
       <section className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 relative overflow-visible">
         <div className="absolute inset-0 bg-gradient-radial from-primary/5 via-transparent to-transparent opacity-60" />
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -427,7 +459,7 @@ export default function Home() {
         </div>
       </article>
 
-      <article id="projects" className="min-h-screen pt-20 sm:pt-32 pb-28 sm:pb-36 px-0 overflow-x-hidden">
+      <article ref={projectsSectionRef} id="projects" className="min-h-screen pt-20 sm:pt-32 pb-28 sm:pb-36 px-0 overflow-x-hidden">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-0">
           <header className="space-y-4 mb-12 sm:mb-16 animate-on-scroll">
             <p className="text-primary font-mono text-glow-subtle text-sm sm:text-base">Projects</p>
@@ -437,7 +469,7 @@ export default function Home() {
             </p>
           </header>
           <div className="relative">
-            {!isMobile && (
+            {!isMobile && shouldRenderProjectsRobot && (
               <div className="hidden lg:block absolute inset-y-0 right-[-70%] w-[130%] z-0">
                 <div className="relative h-full">
                   <div
@@ -456,12 +488,14 @@ export default function Home() {
                 </div>
               </div>
             )}
-            <div className="lg:hidden relative mb-8 rounded-2xl overflow-hidden border border-border/60 bg-black h-[360px] sm:h-[420px]">
-              <SplineScene
-                scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-                className="w-full h-full scale-[1.2]"
-              />
-            </div>
+            {shouldRenderProjectsRobot && (
+              <div className="lg:hidden relative mb-8 rounded-2xl overflow-hidden border border-border/60 bg-black h-[360px] sm:h-[420px]">
+                <SplineScene
+                  scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+                  className="w-full h-full scale-[1.2]"
+                />
+              </div>
+            )}
             <div ref={projectsGridRef} className="grid sm:grid-cols-2 gap-4 sm:gap-6 relative z-20 w-full lg:pr-12 xl:pr-16 pointer-events-none">
               {memoizedProjects.map((project, index) => (
                 <Card
@@ -608,11 +642,12 @@ export default function Home() {
       </article>
 
       <section
+        ref={contactSectionRef}
         id="contact"
         className="min-h-screen -mt-8 sm:-mt-14 lg:-mt-20 pt-44 sm:pt-56 pb-20 sm:pb-28 px-4 sm:px-6 lg:px-8 relative overflow-visible"
       >
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40 sm:opacity-20 overflow-visible">
-          <ContactGlobe />
+          {shouldRenderContactGlobe && <ContactGlobe />}
         </div>
         <div className="max-w-3xl mx-auto relative z-10">
           <header className="space-y-4 mb-12 sm:mb-16 text-center animate-on-scroll">
