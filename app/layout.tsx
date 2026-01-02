@@ -8,18 +8,29 @@ import Navigation from "@/components/navigation"
 import { ScrollAnimations } from "@/components/scroll-animations"
 import { Suspense } from "react"
 
+const nameVariants = [
+  "Tahasin Shahadat",
+  "Tahsin Shadat",
+  "Tahsin Shahadat",
+  "Tahseen Shadat",
+  "Tahseen Shahadat",
+  "Taseen Shadat",
+  "Taseen Shahadat",
+  "Tasin Shadat",
+  "Tasin Shahadat",
+  "Tahasin S",
+  "T Shadat",
+  "T Shahadat",
+]
+
+const keywordNames = ["Tahasin Shadat", ...nameVariants]
+
 export const metadata: Metadata = {
   title: "Tahasin Shadat | Software Engineer, AI & Robotics Developer at Northwestern University",
   description:
-    "Tahasin Shadat (also known as Tahsin Shadat, Tahseen Shadat) is a software engineer and undergraduate at Northwestern University specializing in full-stack development, artificial intelligence, robotics, and machine learning. Experienced SWE intern at AWS, Brookfield Asset Management, Scale AI, and Google. Portfolio showcasing AI projects, robotics systems, and full-stack applications.",
+    "Tahasin Shadat is a software engineer and undergraduate at Northwestern University specializing in full-stack development, artificial intelligence, robotics, and machine learning. Experienced SWE intern at AWS, Brookfield Asset Management, Scale AI, and Google. Portfolio showcasing AI projects, robotics systems, and full-stack applications.",
   keywords: [
-    "Tahasin Shadat",
-    "Tahsin Shadat",
-    "Tahseen Shadat",
-    "Taseen Shadat",
-    "Tasin Shadat",
-    "Tahasin S",
-    "T Shadat",
+    ...keywordNames,
     "Software Engineer",
     "Full Stack Developer",
     "AI Developer",
@@ -125,14 +136,7 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Person",
               name: "Tahasin Shadat",
-              alternateName: [
-                "Tahsin Shadat",
-                "Tahseen Shadat",
-                "Taseen Shadat",
-                "Tasin Shadat",
-                "Tahasin S",
-                "T Shadat",
-              ],
+              alternateName: nameVariants,
               url: "https://tahasin.dev",
               image: "https://tahasin.dev/linkedin-pfp.jpg",
               jobTitle: "Software Engineer",
